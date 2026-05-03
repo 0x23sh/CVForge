@@ -1,0 +1,92 @@
+{
+  "theme": "Light",
+  "archetype": "Archetype 4: Swiss & High-Contrast",
+  "domain": "SaaS / AI CV Builder",
+  "brand_name": "CVForge",
+  "core_principles": [
+    "Swiss Corporate Precision: Minimalist, authoritative, and data-driven.",
+    "No AI Slop: Zero purple/teal gradients. Zero generic Inter typography.",
+    "Bento Grid Density: Use rigid, structured layouts to convey trust and engineering quality.",
+    "High Contrast: Leverage stark white against deeply tinted cool greys and piercing signal accents."
+  ],
+  "typography": {
+    "fonts": {
+      "heading": "Outfit",
+      "body": "IBM Plex Sans"
+    },
+    "rules": {
+      "H1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none",
+      "H2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight",
+      "H3": "text-xl sm:text-2xl tracking-tight",
+      "H4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed",
+      "labels": "text-xs tracking-[0.2em] uppercase font-bold"
+    }
+  },
+  "colors": {
+    "background": {
+      "primary": "bg-white",
+      "secondary": "bg-slate-50",
+      "surface": "bg-white",
+      "inverse": "bg-slate-950"
+    },
+    "text": {
+      "primary": "text-slate-900",
+      "secondary": "text-slate-500",
+      "inverse": "text-white"
+    },
+    "border": "border-slate-200",
+    "accent": {
+      "primary": "bg-[#002FA7]",
+      "primary_hover": "bg-[#00227A]",
+      "primary_text": "text-[#002FA7]"
+    }
+  },
+  "layout": {
+    "spacing": "Generous Spacing (p-6, p-8, p-12) for containers. Keep elements breathing.",
+    "grid_marketing": "Bento Grid Mode A (Tetris) - grid-cols-1 md:grid-cols-12 gap-8.",
+    "grid_dashboard": "Control Room Grid Mode B - grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6. Dense but clear."
+  },
+  "surfaces": {
+    "headers": "Crystal Glassmorphism: bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm",
+    "cards": "Grid Borders: border-collapse style or crisp 1px borders (border-slate-200) with flat white backgrounds. Hover: -translate-y-1 shadow-lg",
+    "inputs": "Neumorphism twist: Soft inner shadow with sharp 1px border. bg-slate-50 border-slate-200."
+  },
+  "components_strategy": {
+    "marketing": "Pure HTML/Tailwind for overlapping layouts and bento grids. No Shadcn wrappers for raw layout.",
+    "interactive": "Shadcn UI (heavily customized). Use Shadcn for Form, Input, Select, Dialog. Flatten the borders and ensure font matches.",
+    "buttons": "Sharp edges (rounded-sm or rounded-none). No large pill shapes. High contrast hover states."
+  },
+  "media": {
+    "images": [
+      {
+        "category": "Hero / Branding",
+        "description": "Abstract modern corporate background blue white",
+        "url": "https://images.unsplash.com/photo-1763929154494-a3d6eba05282?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMG1vZGVybiUyMGNvcnBvcmF0ZSUyMGJhY2tncm91bmQlMjBibHVlJTIwd2hpdGV8ZW58MHx8fHwxNzc3ODM2MDk2fDA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Feature Showcase",
+        "description": "Modern business professional office - People in a modern office lobby",
+        "url": "https://images.unsplash.com/photo-1758691736933-bb0f88fe2e0c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDB8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBidXNpbmVzcyUyMHByb2Zlc3Npb25hbCUyMG9mZmljZXxlbnwwfHx8fDE3Nzc4MzYwNzd8MA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Testimonials / Users",
+        "description": "Woman using her phone at desk",
+        "url": "https://images.unsplash.com/photo-1762341114881-669da93fef88?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDB8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBidXNpbmVzcyUyMHByb2Zlc3Npb25hbCUyMG9mZmljZXxlbnwwfHx8fDE3Nzc4MzYwNzd8MA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Background Texture",
+        "description": "Abstract blue and white flowing fabric texture",
+        "url": "https://images.unsplash.com/photo-1776448611495-ae2f69ae521e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMG1vZGVybiUyMGNvcnBvcmF0ZSUyMGJhY2tncm91bmQlMjBibHVlJTIwd2hpdGV8ZW58MHx8fHwxNzc3ODM2MDk2fDA&ixlib=rb-4.1.0&q=85"
+      }
+    ],
+    "image_rules": "Overlay hero images with max bg-white/40 (light theme) or use a gradient. Do not use blank transparent overlays."
+  },
+  "instructions_to_main_agent": {
+    "dependencies": "yarn add @phosphor-icons/react lucide-react framer-motion",
+    "testing": "All interactive elements MUST include a 'data-testid' attribute (e.g., data-testid='cv-submit-button').",
+    "icons": "Use Phosphor Icons (@phosphor-icons/react) for a high-end dense professional look.",
+    "language": "All app copy must be in French as specified in the problem statement.",
+    "pricing_ui": "Use 3-Column Cards pattern. Make middle tier 'Recommended' with bolder outline. Implement annual/monthly toggle showing dollar savings."
+  }
+}
