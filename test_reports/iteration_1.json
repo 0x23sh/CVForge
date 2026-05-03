@@ -1,0 +1,47 @@
+{
+  "summary": "Ran comprehensive pytest suite (29 tests) against CVForge backend covering health, auth, CV CRUD + AI generation, templates, free-tier limit, premium gating, PDF export, Stripe checkout session + status, and webhook signature validation. 28/29 passed. Sole failure is GET /api/payments/checkout/status/{session_id} returning 500 instead of handling Stripe lookup errors gracefully.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "GET /api/payments/checkout/status/{session_id}",
+        "issue": "Returns 500 Internal Server Error when Stripe API fails to retrieve the session (emergentintegrations.payments.stripe.checkout.CheckoutError: 'No such checkout.session: cs_test_...'). Observed immediately after a successful POST /api/payments/checkout/session in the same request flow. The endpoint should catch the CheckoutError and return a proper HTTP error (e.g. 502/503 or 404) rather than leaking an unhandled exception. Root cause: line 659 in server.py calls `await stripe.get_checkout_status(session_id)` without try/except; the Stripe sandbox key 'sk_test_emergent' occasionally returns 'No such session' even for sessions it just created.",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_cvforge_backend.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Wrap `await stripe.get_checkout_status(session_id)` in GET /api/payments/checkout/status/{session_id} with try/except CheckoutError, returning HTTPException(502, 'Impossible de vérifier le paiement') or similar instead of 500. Ideally also return the last-known DB txn status when Stripe is unreachable."
+  ],
+  "critical_code_review_comments": [
+    "payments/checkout/status handler has no error handling around Stripe SDK call – unhandled exceptions become 500s (confirmed in logs).",
+    "JWT_SECRET in /app/backend/.env is the placeholder 'change-me-cvforge-prod-secret-2026' – acceptable for dev but must be rotated before prod.",
+    "bcrypt password hashing, uuid IDs, JSON-safe responses (no _id leak), UUID-based user/CV ids, and premium/template gating are all implemented correctly.",
+    "GET /api/cv/{id} returns the raw DB document (including raw_input). That is fine, but consider using a response_model to avoid accidental field leakage in future (e.g. if password_hash ever lands on that collection).",
+    "server.py is 738 lines – approaching the 700-line split threshold. Consider separating auth, cv, payments, and PDF builder into modules.",
+    "optimize_cv_with_ai has solid JSON-robustness fallback and fence-stripping.",
+    "Free-tier limit increment (`$inc: cvs_generated`) happens after successful CV insert – correct ordering.",
+    "Stripe checkout_status does not roll back is_premium if Stripe returns 'expired' or 'unpaid' after a prior 'paid' (minor)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_cvforge_backend.py (new)",
+    "/app/backend/tests/conftest.py (new)"
+  ],
+  "success_rate": {"backend": "96.5% (28/29)", "frontend": "N/A (skipped per request)"},
+  "test_credentials": "Dynamic: test_<uuid>@cvforge.dev / TestPass123! (registered at runtime). Sample persisted: testuser@cvforge.dev / TestPass123!",
+  "seed_data_creation": "Two ephemeral users and one CV created per run via registration; CV deleted at end of CV test class. Payment transactions rows remain in db.payment_transactions (session_id recorded with status=initiated).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Re-run `pytest /app/backend/tests/test_cvforge_backend.py -v` after main agent adds try/except around stripe.get_checkout_status in server.py (line 659). All other 28 assertions (auth register/login/me, duplicate handling, CV generation via GPT-5.2, free tier 402, premium template gating, ownership 404, template update, PDF download with %PDF magic-bytes + Content-Type check, Stripe session creation, webhook 400 on bad sig) currently pass.",
+  "rca_of_the_issue": "Reproduction: 1) POST /api/payments/checkout/session with valid auth & {package_id:'premium_monthly', origin_url:'https://...'} returns 200 with a session_id. 2) Immediately GET /api/payments/checkout/status/{session_id} with same token -> 500. Backend log shows `emergentintegrations.payments.stripe.checkout.CheckoutError: Failed to retrieve session status: No such checkout.session: cs_test_...`. Root cause: the endpoint does not catch CheckoutError, so FastAPI surfaces it as 500. Mitigation: wrap the SDK call in try/except, return an HTTPException with an appropriate code (e.g. 502), and optionally fall back to the DB transaction's last-known payment_status when Stripe is unavailable."
+}
