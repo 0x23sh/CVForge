@@ -217,7 +217,7 @@ def user_to_out(user: dict) -> UserOut:
 # ============ Auth ============
 @api.post("/auth/register", response_model=TokenResponse)
 async def register(body: UserSignup):
-    existing = await db.users.find_one({"email": body.email.lower()})
+    existing = await db.users.find_one({"email": body.email.lower()}, {"_id": 1})
     if existing:
         raise HTTPException(status_code=400, detail="Email déjà utilisé")
     user_doc = {
@@ -393,7 +393,11 @@ async def generate_cv(cv: CVInput, current=Depends(get_current_user)):
 
 @api.get("/cv/list", response_model=List[CVOut])
 async def list_cvs(current=Depends(get_current_user)):
-    items = await db.cvs.find({"user_id": current["id"]}, {"_id": 0}).sort("created_at", -1).to_list(200)
+    projection = {
+        "_id": 0, "id": 1, "user_id": 1, "target_job": 1,
+        "full_name": 1, "template": 1, "created_at": 1, "optimized": 1,
+    }
+    items = await db.cvs.find({"user_id": current["id"]}, projection).sort("created_at", -1).to_list(200)
     return [
         CVOut(
             id=i["id"],
@@ -680,7 +684,7 @@ async def checkout_status(session_id: str, request: Request, current=Depends(get
             }},
         )
 
-    user = await db.users.find_one({"id": current["id"]}, {"_id": 0})
+    user = await db.users.find_one({"id": current["id"]}, {"_id": 0, "is_premium": 1})
     return CheckoutStatusOut(
         status=status_resp.status,
         payment_status=status_resp.payment_status,
